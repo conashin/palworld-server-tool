@@ -128,7 +128,7 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: Release $date
+        tag_name: ${{ date }}
         draft: false
         prerelease: false
         files: |
