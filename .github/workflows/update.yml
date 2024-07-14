@@ -95,14 +95,26 @@ jobs:
 
     - name: Build for different platforms
       run: |
-        GOOS=windows GOARCH=386 go build -ldflags="-s -w -X 'main.version='" -o ./dist/windows_x86_64.exe main.go
-        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X 'main.version='" -o ./dist/linux_x86_64 main.go
-        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'main.version='" -o ./dist/linux_aarch64 main.go
-        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'main.version='" -o ./dist/darwin_arm64 main.go
-        GOOS=windows GOARCH=386 go build -ldflags="-s -w" -o ./dist/pst-agent_windows_x86_64.exe ./cmd/pst-agent/main.go
-        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./dist/pst-agent_linux_x86_64 ./cmd/pst-agent/main.go
-        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o ./dist/pst-agent_linux_aarch64 ./cmd/pst-agent/main.go
-        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o ./dist/pst-agent_darwin_arm64 ./cmd/pst-agent/main.go
+        GOOS=windows GOARCH=386 go build -ldflags="-s -w -X 'main.version='" -o ./dist/windows_x86_64/pst.exe main.go
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X 'main.version='" -o ./dist/linux_x86_64/pst main.go
+        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'main.version='" -o ./dist/linux_aarch64/pst main.go
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'main.version='" -o ./dist/darwin_arm64/pst main.go
+        GOOS=windows GOARCH=386 go build -ldflags="-s -w" -o ./dist/pst-agent__windows_x86_64.exe ./cmd/pst-agent/main.go
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./dist/pst-agent__linux_x86_64 ./cmd/pst-agent/main.go
+        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o ./dist/pst-agent__linux_aarch64 ./cmd/pst-agent/main.go
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o ./dist/pst-agent__darwin_arm64 ./cmd/pst-agent/main.go
+
+    - name: Moving compiled
+      run:
+        mkdir bin
+        mv ./dist/windows_x86_64/pst.exe ./bin/windows_x86_64.exe
+        mv ./dist/linux_x86_64/pst ./bin/linux_x86_64
+        mv ./dist/linux_aarch64/pst ./bin/linux_aarch64
+        mv ./dist/darwin_arm64/pst ./bin/darwin_arm64
+        mv ./dist/pst-agent__windows_x86_64.exe ./bin/pst-agent__windows_x86_64.exe
+        mv ./dist/pst-agent__linux_x86_64 ./bin/pst-agent__linux_x86_64
+        mv ./dist/pst-agent__linux_aarch64 ./bin/pst-agent__linux_aarch64
+        mv ./dist/pst-agent__darwin_arm64 ./bin/pst-agent__darwin_arm64
 
     - name: Set Node options to avoid memory errors
       env:
@@ -120,7 +132,7 @@ jobs:
       with:
         name: build-artifacts
         path: |
-          dist/
+          bin/
 
     - name: Generate tag and release name
       id: tag_release_name
@@ -135,14 +147,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          dist/windows_x86_64.exe
-          dist/linux_x86_64
-          dist/linux_aarch64
-          dist/darwin_arm64
-          dist/pst-agent_windows_x86_64.exe
-          dist/pst-agent_linux_x86_64
-          dist/pst-agent_linux_aarch64
-          dist/pst-agent_darwin_arm64
+          bin/*
         tag_name: ${{ env.TAG_NAME }}
         body: Automated release from GitHub Actions.
         draft: false
