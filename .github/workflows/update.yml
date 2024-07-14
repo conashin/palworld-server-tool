@@ -76,12 +76,12 @@ jobs:
     - name: Run build.ps1 script
       shell: pwsh
       run: |
+        cd module
         ./build.ps1
 
     - name: Build sav_cli
       if: steps.check_update.outputs.update_needed == 'true'
       run: |
-        cd module
         chmod +x build.sh
         ./build.sh
         cd ..
