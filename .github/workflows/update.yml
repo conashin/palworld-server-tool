@@ -87,6 +87,18 @@ jobs:
         make init
         make build-pub
 
+    - name: Build for different platforms
+      run: |
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'main.version='" -o ./dist/darwin_arm64/pst main.go
+        GOOS=windows GOARCH=386 go build -ldflags="-s -w" -o ./dist/pst-agent__windows_x86_64.exe ./cmd/pst-agent/main.go
+        GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./dist/pst-agent__linux_x86_64 ./cmd/pst-agent/main.go
+        GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o ./dist/pst-agent__linux_aarch64 ./cmd/pst-agent/main.go
+        GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o ./dist/pst-agent__darwin_arm64 ./cmd/pst-agent/main.go
+
+    - name: Copy sav_cli file
+      run: |
+        cp module/dist/sav_cli_windows_x86_64.exe dist/windows_x86_64/sav_cli.exe
+
     - name: Set Node options to avoid memory errors
       env:
         NODE_OPTIONS: '--max-old-space-size=8192'
