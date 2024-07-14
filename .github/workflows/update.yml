@@ -105,7 +105,7 @@ jobs:
         GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o ./dist/pst-agent__darwin_arm64 ./cmd/pst-agent/main.go
 
     - name: Moving compiled
-      run:
+      run: |
         mkdir bin
         mv ./dist/windows_x86_64/pst.exe ./bin/windows_x86_64.exe
         mv ./dist/linux_x86_64/pst ./bin/linux_x86_64
