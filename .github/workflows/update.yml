@@ -125,6 +125,14 @@ jobs:
           dist/linux_aarch64
           dist/darwin_arm64
 
+    - name: Generate tag and release name
+      id: tag_release_name
+      run: |
+        TAG_NAME="release-$(date +'%Y%m%d%H%M%S')"
+        echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+        RELEASE_NAME="Release $(date +'%Y%m%d%H%M%S')"
+        echo "RELEASE_NAME=${RELEASE_NAME}" >> $GITHUB_ENV
+
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
@@ -134,8 +142,9 @@ jobs:
           dist/linux_x86_64/*
           dist/linux_aarch64/*
           dist/darwin_arm64/*
-        tag_name: release-$(date +'%Y%m%d%H%M%S')
+        tag_name: ${{ env.TAG_NAME }}
+        body: Automated release from GitHub Actions.
         draft: false
-        prerelease: true
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
