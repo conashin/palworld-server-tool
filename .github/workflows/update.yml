@@ -82,6 +82,7 @@ jobs:
     - name: Build sav_cli
       if: steps.check_update.outputs.update_needed == 'true'
       run: |
+        cd module
         chmod +x build.sh
         ./build.sh
         cd ..
