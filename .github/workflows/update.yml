@@ -134,9 +134,11 @@ jobs:
           dist/linux_x86_64/*
           dist/linux_aarch64/*
           dist/darwin_arm64/*
-        tag_name: ${{ github.run_number }}-release-$(date +'%Y%m%d%H%M%S')
-        release_name: Release ${{ github.run_number }}-$(date +'%Y%m%d%H%M%S')
-        body: Automated release from GitHub Actions.
+        tag_name: release-$(date +'%Y%m%d%H%M%S')
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         draft: false
         prerelease: true
       env:
