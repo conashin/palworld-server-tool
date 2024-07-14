@@ -28,6 +28,11 @@ jobs:
         export PATH=$HOME/.local/share/pnpm:$HOME/.pnpm-global/bin:$PATH
         echo "PATH=$HOME/.local/share/pnpm:$HOME/.pnpm-global/bin:$PATH" >> $GITHUB_ENV
 
+    - name: Initialize pnpm and generate pnpm-lock.yaml
+      run: |
+        pnpm init -y
+        pnpm install
+
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
