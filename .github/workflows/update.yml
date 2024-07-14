@@ -1,0 +1,104 @@
+name: Build and Update
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * *' # 每天定时检查一次
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20' # 可以根据需要调整Go版本
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.20.4'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      run: |
+        curl -fsSL https://get.pnpm.io/install.sh | sh -
+        source ~/.bashrc
+
+    - name: Install Python and dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y python3-pip jq
+        pip3 install --upgrade pip
+        pip3 install pyinstaller
+
+    - name: Get latest version of palworld-save-tools
+      id: get_version
+      run: |
+        latest_version=$(curl -s https://api.github.com/repos/cheahjs/palworld-save-tools/releases/latest | jq -r .tag_name)
+        echo "Latest version of palworld-save-tools is $latest_version"
+        echo "::set-output name=latest_version::$latest_version"
+
+    - name: Check if update is needed
+      id: check_update
+      run: |
+        current_version=$(grep 'palworld-save-tools==' module/requirements.txt | cut -d'=' -f3)
+        latest_version=${{ steps.get_version.outputs.latest_version }}
+        if [ "$current_version" == "$latest_version" ]; then
+          echo "No update needed"
+          echo "::set-output name=update_needed::false"
+        else
+          echo "Update needed"
+          echo "::set-output name=update_needed::true"
+        fi
+
+    - name: Update palworld-save-tools version in requirements.txt
+      if: steps.check_update.outputs.update_needed == 'true'
+      run: |
+        latest_version=${{ steps.get_version.outputs.latest_version }}
+        sed -i "s/palworld-save-tools==[0-9.]*/palworld-save-tools==$latest_version/" module/requirements.txt
+        cat module/requirements.txt # Display the updated requirements.txt for verification
+
+    - name: Build sav_cli
+      if: steps.check_update.outputs.update_needed == 'true'
+      run: |
+        cd module
+        chmod +x build.sh
+        ./build.sh
+        cd ..
+
+    - name: Initialize and build project
+      if: steps.check_update.outputs.update_needed == 'true'
+      run: |
+        make init
+        make build-pub
+
+    - name: Set Node options to avoid memory errors
+      env:
+        NODE_OPTIONS: '--max-old-space-size=8192'
+      run: echo "Node options set"
+
+    - name: Add PyInstaller to PATH
+      run: echo "PATH=$PATH:/home/runner/.local/lib/python3.10/site-packages" >> $GITHUB_ENV
+
+    - name: Verify PyInstaller installation
+      run: pip3 show pyinstaller
+
+    - name: Create Release
+      if: steps.check_update.outputs.update_needed == 'true'
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ steps.get_version.outputs.latest_version }}
+        name: Release ${{ steps.get_version.outputs.latest_version }}
+        body: |
+          New version of palworld-save-tools detected and built.
+        draft: false
+        prerelease: false
