@@ -73,6 +73,11 @@ jobs:
         sed -i "s/palworld-save-tools==[0-9.]*/palworld-save-tools==$latest_version/" module/requirements.txt
         cat module/requirements.txt # Display the updated requirements.txt for verification
 
+    - name: Run build.ps1 script
+      shell: pwsh
+      run: |
+        ./build.ps1
+
     - name: Build sav_cli
       if: steps.check_update.outputs.update_needed == 'true'
       run: |
