@@ -115,14 +115,23 @@ jobs:
     - name: Verify PyInstaller installation
       run: pip3 show pyinstaller
 
-    - name: Create Release
-      if: steps.check_update.outputs.update_needed == 'true'
-      uses: ncipollo/release-action@v1
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ steps.get_version.outputs.latest_version }}
-        name: Release ${{ steps.get_version.outputs.latest_version }}
-        body: |
-          New version of palworld-save-tools detected and built.
-        draft: false
-        prerelease: false
+        name: build-artifacts
+        path: |
+          dist/windows_x86_64
+          dist/linux_x86_64
+          dist/linux_aarch64
+          dist/darwin_arm64
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/windows_x86_64/*
+          dist/linux_x86_64/*
+          dist/linux_aarch64/*
+          dist/darwin_arm64/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
