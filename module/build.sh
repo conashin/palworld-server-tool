@@ -4,3 +4,6 @@ pyinstaller --onefile sav_cli.py -n sav_cli_$(uname -s | tr 'A-Z' 'a-z')_$(uname
 
 # Compile for aarch64
 pyinstaller --onefile sav_cli.py -n sav_cli_linux_aarch64
+
+# Compile for darwin arm64
+pyinstaller --onefile sav_cli.py -n sav_cli_darwin_arm64
