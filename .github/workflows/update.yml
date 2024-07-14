@@ -128,10 +128,7 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag: $date
-        name: Release $date
-        body: |
-          New version of palworld-save-tools detected and built.
+        tag_name: Release $date
         draft: false
         prerelease: false
         files: |
