@@ -127,9 +127,17 @@ jobs:
 
     - name: Create Release
       id: create_release
-      run: |
-        TAG=$(date +'%Y%m%d%H%M%S')
-        echo "TAG=$TAG" >> $GITHUB_ENV
-        gh release create $TAG dist/windows_x86_64/* dist/linux_x86_64/* dist/linux_aarch64/* dist/darwin_arm64/* --title "Release $TAG"
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/windows_x86_64/*
+          dist/linux_x86_64/*
+          dist/linux_aarch64/*
+          dist/darwin_arm64/*
+        tag_name: ${{ github.run_number }}-release-$(date +'%Y%m%d%H%M%S')
+        release_name: Release ${{ github.run_number }}-$(date +'%Y%m%d%H%M%S')
+        body: Automated release from GitHub Actions.
+        draft: false
+        prerelease: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
