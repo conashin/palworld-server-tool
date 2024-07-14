@@ -23,9 +23,10 @@ jobs:
 
     - name: Install pnpm
       run: |
+        export SHELL=/bin/bash
         curl -fsSL https://get.pnpm.io/install.sh | sh -
-        echo "export PATH=$HOME/.local/share/pnpm:$HOME/.pnpm-global/bin:$PATH" >> $GITHUB_ENV
-        source $GITHUB_ENV
+        export PATH=$HOME/.local/share/pnpm:$HOME/.pnpm-global/bin:$PATH
+        echo "PATH=$HOME/.local/share/pnpm:$HOME/.pnpm-global/bin:$PATH" >> $GITHUB_ENV
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
